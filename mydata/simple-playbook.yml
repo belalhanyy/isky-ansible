@@ -1,0 +1,48 @@
+---
+- name: play1 manage isky  webservers 
+  hosts: isky
+  vars_files: 
+   - vars.yml
+  tasks: 
+    - name: T1 create user 
+      user: 
+        name: "{{U}}"
+        state: present
+    
+    - name: T2 install web
+      dnf:
+        name: "{{SW}}"
+        state: present
+
+    - name: T3 enable web
+      service: 
+       name: "{{SW}}"
+       state: started
+       enabled: yes
+
+    - name: T4 open port 80/http
+      firewalld: 
+       service: "{{PORT}}"
+       permanent: yes
+       state: enabled 
+       immediate: yes
+
+
+    - name: T5 web site page
+      copy: 
+       src: index.html
+       dest: /var/www/html/index.html
+         ######################################################################################
+- name: play2 test from network
+  hosts: workstation
+  remote_user: student
+  tasks: 
+   - name: T6 test page
+     uri: 
+      url: http://serverb
+      status_code: 200
+
+
+   - name: print out
+     debug: 
+      msg: "your web is running well !"
